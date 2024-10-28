@@ -1,5 +1,5 @@
 # Import necessary libraries
-from fastapi import FastAPI
+from fastapi import FastAPI,Response, status
 from sqlalchemy import create_engine, Column, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -71,8 +71,7 @@ def fetch_weather_data():
     finally:
         db.close()
 
-# FastAPI route to manually trigger data collection
 @app.get("/collect-weather-data")
 def collect_weather_data():
     fetch_weather_data()
-    return {"status": "success"}
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
