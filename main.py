@@ -72,7 +72,7 @@ def fetch_weather_data():
         "soil_temperature_0cm": data["hourly"]["soil_temperature_0cm"],
     }
     hourly_df = pd.DataFrame(hourly_data)
-    now = datetime.now(pytz.UTC)
+    now = datetime.now(pytz.timezone('Europe/Lisbon'))
     hourly_df["time_diff"] = abs(hourly_df["date"] - now)
     closest_data = hourly_df.loc[hourly_df["time_diff"].idxmin()] 
     # Save to database
