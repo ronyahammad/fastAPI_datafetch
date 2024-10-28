@@ -1,10 +1,12 @@
-# Import necessary libraries
-from fastapi import FastAPI,Response, status
+from fastapi import FastAPI,Response, status, Depends
 from sqlalchemy import create_engine, Column, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session,sessionmaker
 import requests
+from typing import List
 import pandas as pd
+from pydantic import BaseModel
+from datetime import datetime
 
 app = FastAPI()
 
@@ -13,6 +15,12 @@ DATABASE_URL = "sqlite:///./weather_data.db"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # Define SQLAlchemy model
 class WeatherData(Base):
@@ -24,7 +32,17 @@ class WeatherData(Base):
     vapour_pressure_deficit = Column(Float)
     wind_speed_10m = Column(Float)
     soil_temperature_0cm = Column(Float)
+class WeatherDataSchema(BaseModel):
+    id: datetime
+    temperature_2m: float
+    relative_humidity_2m: float
+    surface_pressure: float
+    vapour_pressure_deficit: float
+    wind_speed_10m: float
+    soil_temperature_0cm: float
 
+    class Config:
+        orm_mode = True
 # Create tables
 Base.metadata.create_all(bind=engine)
 
@@ -75,3 +93,8 @@ def fetch_weather_data():
 def collect_weather_data():
     fetch_weather_data()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@app.get("/weather-data", response_model=List[WeatherDataSchema])
+def get_weather_data(db: Session = Depends(get_db)):
+    data = db.query(WeatherData).all()
+    return data
