@@ -1,7 +1,6 @@
-from fastapi import FastAPI,Response, status, Depends
+from fastapi import FastAPI, Response, status, Depends
 from sqlalchemy import create_engine, Column, Float, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session,sessionmaker
+from sqlalchemy.orm import declarative_base, Session, sessionmaker
 import requests
 from typing import List
 import pandas as pd
@@ -15,6 +14,7 @@ DATABASE_URL = "sqlite:///./weather_data.db"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
 def get_db():
     db = SessionLocal()
     try:
@@ -32,6 +32,7 @@ class WeatherData(Base):
     vapour_pressure_deficit = Column(Float)
     wind_speed_10m = Column(Float)
     soil_temperature_0cm = Column(Float)
+
 class WeatherDataSchema(BaseModel):
     id: datetime
     temperature_2m: float
@@ -43,6 +44,7 @@ class WeatherDataSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
 # Create tables
 Base.metadata.create_all(bind=engine)
 
