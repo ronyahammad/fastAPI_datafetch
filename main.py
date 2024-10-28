@@ -75,4 +75,4 @@ def fetch_weather_data():
 @app.get("/collect-weather-data")
 def collect_weather_data():
     fetch_weather_data()
-    return {"status": "Data collected and saved to database."}
+    return {"status": "success"}
