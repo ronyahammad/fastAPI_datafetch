@@ -6,7 +6,7 @@ from typing import List
 import pandas as pd
 from pydantic import BaseModel
 from datetime import datetime
-
+import pytz
 
 app = FastAPI()
 
@@ -73,23 +73,23 @@ def fetch_weather_data():
         "soil_temperature_0cm": data["hourly"]["soil_temperature_0cm"],
     }
     hourly_df = pd.DataFrame(hourly_data)
-    """ now = datetime.now(pytz.UTC)
+    now = datetime.now(pytz.UTC)
     hourly_df["time_diff"] = abs(hourly_df["date"] - now)
-    closest_data = hourly_df.loc[hourly_df["time_diff"].idxmin()] """
+    closest_data = hourly_df.loc[hourly_df["time_diff"].idxmin()] 
     # Save to database
     db = SessionLocal()
     try:
-        for _, row in hourly_df.iterrows():
-            weather_record = WeatherData(
-                id=row["date"],
-                temperature_2m=row["temperature_2m"],
-                relative_humidity_2m=row["relative_humidity_2m"],
-                surface_pressure=row["surface_pressure"],
-                vapour_pressure_deficit=row["vapour_pressure_deficit"],
-                wind_speed_10m=row["wind_speed_10m"],
-                soil_temperature_0cm=row["soil_temperature_0cm"]
-            )
-            db.merge(weather_record)  
+        """ for _, row in hourly_df.iterrows(): """
+        weather_record = WeatherData(
+            id=closest_data["date"],
+            temperature_2m=closest_data["temperature_2m"],
+            relative_humidity_2m=closest_data["relative_humidity_2m"],
+            surface_pressure=closest_data["surface_pressure"],
+            vapour_pressure_deficit=closest_data["vapour_pressure_deficit"],
+            wind_speed_10m=closest_data["wind_speed_10m"],
+            soil_temperature_0cm=closest_data["soil_temperature_0cm"]
+        )
+        db.add(weather_record)  
         db.commit()
     finally:
         db.close()
