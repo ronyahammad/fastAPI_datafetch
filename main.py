@@ -7,6 +7,7 @@ import pandas as pd
 from pydantic import BaseModel
 from datetime import datetime
 
+
 app = FastAPI()
 
 # Database setup
@@ -22,7 +23,7 @@ def get_db():
     finally:
         db.close()
 
-# Define SQLAlchemy model
+
 class WeatherData(Base):
     __tablename__ = "weather_data"
     id = Column(DateTime, primary_key=True, index=True)
@@ -45,10 +46,10 @@ class WeatherDataSchema(BaseModel):
     class Config:
         from_attributes = True
 
-# Create tables
+
 Base.metadata.create_all(bind=engine)
 
-# Helper function to fetch and save weather data
+
 def fetch_weather_data():
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
@@ -61,7 +62,7 @@ def fetch_weather_data():
     response = requests.get(url, params=params)
     data = response.json()
 
-    # Process and structure data
+   
     hourly_data = {
         "date": pd.to_datetime(data["hourly"]["time"], utc=True),
         "temperature_2m": data["hourly"]["temperature_2m"],
@@ -72,11 +73,13 @@ def fetch_weather_data():
         "soil_temperature_0cm": data["hourly"]["soil_temperature_0cm"],
     }
     hourly_df = pd.DataFrame(hourly_data)
-
+    """ now = datetime.now(pytz.UTC)
+    hourly_df["time_diff"] = abs(hourly_df["date"] - now)
+    closest_data = hourly_df.loc[hourly_df["time_diff"].idxmin()] """
     # Save to database
     db = SessionLocal()
     try:
-        for index, row in hourly_df.iterrows():
+        for _, row in hourly_df.iterrows():
             weather_record = WeatherData(
                 id=row["date"],
                 temperature_2m=row["temperature_2m"],
@@ -86,7 +89,7 @@ def fetch_weather_data():
                 wind_speed_10m=row["wind_speed_10m"],
                 soil_temperature_0cm=row["soil_temperature_0cm"]
             )
-            db.merge(weather_record)  # `merge` to avoid duplicates on primary key
+            db.merge(weather_record)  
         db.commit()
     finally:
         db.close()
