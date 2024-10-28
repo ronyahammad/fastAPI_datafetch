@@ -57,7 +57,7 @@ def fetch_weather_data():
         "longitude": 7.921066,
         "hourly": ["temperature_2m", "relative_humidity_2m", "surface_pressure", "vapour_pressure_deficit", "wind_speed_10m", "soil_temperature_0cm"],
         "timezone": "auto",
-        "forecast_days": 1
+        "forecast_days": 0
     }
     response = requests.get(url, params=params)
     data = response.json()
