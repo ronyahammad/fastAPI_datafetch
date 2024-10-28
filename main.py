@@ -106,5 +106,5 @@ def get_weather_data(db: Session = Depends(get_db)):
 
 @app.delete("/clear-weather-data", status_code=status.HTTP_204_NO_CONTENT)
 def clear_weather_data(db: Session = Depends(get_db)):
-    db.query(WeatherData).delete()  # Delete all records in the WeatherData table
+    db.query(WeatherData).delete()  
     db.commit()
