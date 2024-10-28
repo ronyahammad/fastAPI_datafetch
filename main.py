@@ -42,7 +42,7 @@ class WeatherDataSchema(BaseModel):
     soil_temperature_0cm: float
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 # Create tables
 Base.metadata.create_all(bind=engine)
 
