@@ -88,7 +88,7 @@ def fetch_weather_data():
             wind_speed_10m=closest_data["wind_speed_10m"],
             soil_temperature_0cm=closest_data["soil_temperature_0cm"]
         )
-        db.add(weather_record)  
+        db.merge(weather_record)  
         db.commit()
     finally:
         db.close()
